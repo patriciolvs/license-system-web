@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licenças a Vencer - Sistema de Gestão de Licenças</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Licenças a Vencer</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Filtros</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="start_date" class="form-label">Data Início</label>
+                        <input type="date" class="form-control" id="start_date" onchange="filterLicenses()">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="end_date" class="form-label">Data Fim</label>
+                        <input type="date" class="form-control" id="end_date" onchange="filterLicenses()">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="client_name_filter" class="form-label">Nome do Cliente</label>
+                        <input type="text" class="form-control" id="client_name_filter" onkeyup="filterLicenses()">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="email_filter" class="form-label">E-mail Compra</label>
+                        <input type="text" class="form-control" id="email_filter" onkeyup="filterLicenses()">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="activation_code_filter" class="form-label">Código de Licença</label>
+                        <input type="text" class="form-control" id="activation_code_filter" onkeyup="filterLicenses()">
+                    </div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" onclick="exportToPDF()">Exportar para PDF</button>
+                <button class="btn btn-secondary w-100 mt-2" onclick="window.print()">Imprimir</button>
+            </div>
+        </div>
+        <div class="table-responsive" id="printableArea">
+            <table class="table table-bordered" id="expiringTable">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Dispositivo</th>
+                        <th>Produto</th>
+                        <th>E-mail Compra</th>
+                        <th>Código Ativação</th>
+                        <th>Data Validade</th>
+                        <th>Dias para Expirar</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <button class="btn btn-secondary w-100 mt-3" onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+    <style media="print">
+        body { font-size: 12pt; }
+        .container { max-width: 100%; }
+        .card, .btn, .form-label, .form-control { display: none; }
+        #printableArea { display: block !important; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+    <script src="scripts.js"></script>
+    <script>
+        let allSales = [];
+        fetchSales().then(sales => {
+            allSales = sales;
+            filterLicenses();
+        });
+
+        function filterLicenses() {
+            const startDate = document.getElementById('start_date').value ? new Date(document.getElementById('start_date').value) : null;
+            const endDate = document.getElementById('end_date').value ? new Date(document.getElementById('end_date').value) : null;
+            const clientNameFilter = document.getElementById('client_name_filter').value.toLowerCase();
+            const emailFilter = document.getElementById('email_filter').value.toLowerCase();
+            const activationCodeFilter = document.getElementById('activation_code_filter').value.toLowerCase();
+            const today = new Date();
+
+            const filteredSales = allSales.filter(sale => {
+                const expirationDate = new Date(sale[6]);
+                const daysToExpire = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+                if (daysToExpire < 0) return false; // Exclui licenças já vencidas
+
+                const withinDateRange = (!startDate || expirationDate >= startDate) && (!endDate || expirationDate <= endDate);
+                const matchesClient = !clientNameFilter || sale[0].toLowerCase().includes(clientNameFilter);
+                const matchesEmail = !emailFilter || sale[3].toLowerCase().includes(emailFilter);
+                const matchesCode = !activationCodeFilter || sale[4].toLowerCase().includes(activationCodeFilter);
+
+                return withinDateRange && matchesClient && matchesEmail && matchesCode;
+            });
+
+            const tbody = document.getElementById('expiringTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            filteredSales.forEach(sale => {
+                const expirationDate = new Date(sale[6]);
+                const daysToExpire = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = sale[0];
+                row.insertCell(1).innerText = sale[1];
+                row.insertCell(2).innerText = sale[2];
+                row.insertCell(3).innerText = sale[3];
+                row.insertCell(4).innerText = sale[4];
+                row.insertCell(5).innerText = expirationDate.toLocaleDateString('pt-BR');
+                row.insertCell(6).innerText = daysToExpire;
+            });
+
+            window.filteredSales = filteredSales; // Para exportação PDF
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text("Licenças a Vencer", 14, 20);
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30);
+
+            const tableData = window.filteredSales.map(sale => {
+                const expirationDate = new Date(sale[6]);
+                const daysToExpire = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
+                return [
+                    sale[0], sale[1], sale[2], sale[3], sale[4],
+                    expirationDate.toLocaleDateString('pt-BR'), daysToExpire.toString()
+                ];
+            });
+
+            doc.autoTable({
+                startY: 40,
+                head: [['Nome do Cliente', 'Dispositivo', 'Produto', 'E-mail Compra', 'Código Ativação', 'Data Validade', 'Dias para Expirar']],
+                body: tableData,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [0, 123, 255] }
+            });
+
+            doc.save('licencas_a_vencer.pdf');
+        }
+    </script>
+</body>
+</html>
