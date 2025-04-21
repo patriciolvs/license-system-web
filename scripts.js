@@ -1,6 +1,25 @@
 // Substitua pelo URL do seu Web App
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
+// Lista predefinida de e-mails
+const emailList = [
+    "lopat@outlook.com",
+    "lopat.nfe@gmail.com",
+    "lopat.nfe@outlook.com",
+    "lopat.jatai@gmail.com",
+    "lopat.tecnologia@outlook.com"
+    "elianesav@hotmail.com"
+];
+
+function populateEmailList() {
+    const datalist = document.getElementById('emailList');
+    emailList.forEach(email => {
+        const option = document.createElement('option');
+        option.value = email;
+        datalist.appendChild(option);
+    });
+}
+
 function downloadBackup() {
     // Baixar backup de vendas
     const salesUrl = new URL(API_URL);
