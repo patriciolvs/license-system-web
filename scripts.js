@@ -1,11 +1,32 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Atualize com o URL real do seu Web App
+const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
+
+function checkUserStatus() {
+    const url = new URL(API_URL);
+    url.searchParams.append('method', 'checkUserStatus');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else if (!data.hasUser) {
+                window.location.href = 'register.html';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao verificar status do usuário:', error);
+            alert('Erro ao verificar status do usuário: ' + error.message);
+        });
+}
 
 function login() {
+    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    localStorage.setItem('email', email);
     localStorage.setItem('password', password);
     const url = new URL(API_URL);
     url.searchParams.append('method', 'checkPassword');
+    url.searchParams.append('email', email);
     url.searchParams.append('password', password);
     fetch(url)
         .then(response => response.json())
@@ -16,12 +37,37 @@ function login() {
             } else if (data) {
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Senha incorreta.');
+                alert('E-mail ou senha incorretos.');
             }
         })
         .catch(error => {
             console.error('Erro ao fazer login:', error);
             alert('Erro ao fazer login: ' + error.message);
+        });
+}
+
+function register() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    localStorage.setItem('email', email);
+    localStorage.setItem('password', password);
+    const url = new URL(API_URL);
+    url.searchParams.append('method', 'registerUser');
+    url.searchParams.append('email', email);
+    url.searchParams.append('password', password);
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Usuário cadastrado com sucesso! Faça login para continuar.');
+                window.location.href = 'index.html';
+            } else {
+                alert('Erro ao cadastrar usuário: ' + (data.error || 'Desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao cadastrar usuário:', error);
+            alert('Erro ao cadastrar usuário: ' + error.message);
         });
 }
 
@@ -49,6 +95,7 @@ function sendBackup() {
 }
 
 function logout() {
+    localStorage.removeItem('email');
     localStorage.removeItem('password');
     window.location.href = 'index.html';
 }
