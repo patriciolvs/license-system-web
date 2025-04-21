@@ -22,12 +22,10 @@
             <label for="product" class="form-label">Produto</label>
             <select class="form-control" id="product" required>
                 <option value="">Selecione...</option>
-                <option value="Kaspersky Standard">Kaspersky Standard</option>
-                <option value="Kaspersky Plus">Kaspersky Plus</option>
-                <option value="Kaspersky Premium">Kaspersky Premium</option>
-                <option value="Kaspersky Office Security ">Kaspersky Office Security</option>
-                <option value="Mcafee Enterprise">Mcafee Enterprise</option>
-                <option value="Microsoft Office 365">Microsoft Office 365</option>
+                <option value="Norton">Norton</option>
+                <option value="Kaspersky">Kaspersky</option>
+                <option value="Bitdefender">Bitdefender</option>
+                <option value="McAfee">McAfee</option>
             </select>
         </div>
         <div class="mb-3">
@@ -108,6 +106,9 @@
                 document.getElementById('total_with_discount').value = parseFloat(sale[12]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 document.getElementById('unit_value_with_discount').value = parseFloat(sale[13]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 document.getElementById('daily_value').value = parseFloat(sale[14]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }).catch(error => {
+                console.error('Erro ao carregar dados para edição:', error);
+                alert('Erro ao carregar dados para edição: ' + error.message);
             });
         }
 
@@ -138,16 +139,41 @@
             const expirationDateObj = new Date(expirationDate);
             if (expirationDateObj <= activationDateObj) return alert('A data de validade deve ser posterior à data de ativação.');
 
+            // Adicionar validação para os campos calculados
+            const daysToExpire = parseInt(document.getElementById('days_to_expire').value);
+            const totalValueStr = document.getElementById('total_value').value;
+            const totalWithDiscountStr = document.getElementById('total_with_discount').value;
+            const unitValueWithDiscountStr = document.getElementById('unit_value_with_discount').value;
+            const dailyValueStr = document.getElementById('daily_value').value;
+
+            if (isNaN(daysToExpire)) return alert('Erro: "Dias para Expirar" não é um número válido.');
+            if (!totalValueStr || !totalWithDiscountStr || !unitValueWithDiscountStr || !dailyValueStr) {
+                return alert('Erro: Um ou mais campos calculados não foram preenchidos corretamente. Tente ajustar os valores e recalcular.');
+            }
+
+            const totalValue = parseFloat(totalValueStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
+            const totalWithDiscount = parseFloat(totalWithDiscountStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
+            const unitValueWithDiscount = parseFloat(unitValueWithDiscountStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
+            const dailyValue = parseFloat(dailyValueStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
+
+            if (isNaN(totalValue) || isNaN(totalWithDiscount) || isNaN(unitValueWithDiscount) || isNaN(dailyValue)) {
+                return alert('Erro: Um ou mais campos calculados contém valores inválidos. Tente ajustar os valores e recalcular.');
+            }
+
             const sale = [
                 clientName, device, product, email, activationCode, activationDate, expirationDate,
-                parseInt(document.getElementById('days_to_expire').value),
+                daysToExpire,
                 parseFloat(licenseValue), parseInt(quantity),
-                parseFloat(document.getElementById('total_value').value.replace('R$ ', '').replace('.', '').replace(',', '.')),
+                totalValue,
                 parseFloat(discount),
-                parseFloat(document.getElementById('total_with_discount').value.replace('R$ ', '').replace('.', '').replace(',', '.')),
-                parseFloat(document.getElementById('unit_value_with_discount').value.replace('R$ ', '').replace('.', '').replace(',', '.')),
-                parseFloat(document.getElementById('daily_value').value.replace('R$ ', '').replace('.', '').replace(',', '.'))
+                totalWithDiscount,
+                unitValueWithDiscount,
+                dailyValue
             ];
+
+            // Log para depuração
+            console.log("Array 'sale' antes de enviar:", sale);
+
             saveSale(sale, row ? parseInt(row) : null, () => {
                 window.location.href = 'dashboard.html';
             });
