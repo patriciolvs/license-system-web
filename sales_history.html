@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Vendas - Sistema de Gestão de Licenças</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Histórico de Vendas</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="salesTable">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Dispositivo</th>
+                        <th>Produto</th>
+                        <th>E-mail</th>
+                        <th>Código Ativação</th>
+                        <th>Data Ativação</th>
+                        <th>Data Validade</th>
+                        <th>Dias para Expirar</th>
+                        <th>Valor Licença</th>
+                        <th>Quantidade</th>
+                        <th>Valor Total</th>
+                        <th>Desconto</th>
+                        <th>Valor c/ Desconto</th>
+                        <th>Valor Unitário c/ Desc</th>
+                        <th>Valor Diário</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <button class="btn btn-secondary w-100 mt-3" onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        fetchSales().then(sales => {
+            const tbody = document.getElementById('salesTable').getElementsByTagName('tbody')[0];
+            sales.forEach((sale, index) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = sale[0];
+                row.insertCell(1).innerText = sale[1];
+                row.insertCell(2).innerText = sale[2];
+                row.insertCell(3).innerText = sale[3];
+                row.insertCell(4).innerText = sale[4];
+                row.insertCell(5).innerText = sale[5];
+                row.insertCell(6).innerText = sale[6];
+                row.insertCell(7).innerText = sale[7];
+                row.insertCell(8).innerText = parseFloat(sale[8]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                row.insertCell(9).innerText = sale[9];
+                row.insertCell(10).innerText = parseFloat(sale[10]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                row.insertCell(11).innerText = parseFloat(sale[11]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                row.insertCell(12).innerText = parseFloat(sale[12]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                row.insertCell(13).innerText = parseFloat(sale[13]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                row.insertCell(14).innerText = parseFloat(sale[14]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const actionsCell = row.insertCell(15);
+                actionsCell.innerHTML = `
+                    <button class="btn btn-primary btn-sm" onclick="window.location.href='add_sale.html?row=${index}'">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSale(${index})">Excluir</button>
+                `;
+            });
+        });
+
+        function deleteSale(index) {
+            if (confirm('Tem certeza que deseja excluir esta venda?')) {
+                const url = new URL(API_URL);
+                url.searchParams.append('method', 'deleteSale');
+                url.searchParams.append('password', localStorage.getItem('password'));
+                url.searchParams.append('row', index);
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) window.location.reload();
+                        else alert('Erro ao excluir venda: ' + (data.error || 'Desconhecido'));
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

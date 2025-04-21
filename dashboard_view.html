@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Gestão de Licenças</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Dashboard de Gestão de Licenças</h1>
+        <div id="metrics">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Licenças Vendidas</h5>
+                    <p class="card-text" id="totalLicenses">0</p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Receita Total</h5>
+                    <p class="card-text" id="totalRevenue">R$ 0,00</p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Licenças a Expirar (10 dias)</h5>
+                    <p class="card-text" id="expiringLicenses">0</p>
+                </div>
+            </div>
+        </div>
+        <canvas id="revenueChart" class="mb-3"></canvas>
+        <button class="btn btn-primary w-100 mb-3" onclick="showExpiring()">Verificar Expirações</button>
+        <button class="btn btn-secondary w-100" onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        fetchSales().then(sales => {
+            let totalLicenses = sales.length;
+            let totalRevenue = 0;
+            let expiringLicenses = 0;
+            let expiringSales = [];
+            const today = new Date();
+
+            sales.forEach(sale => {
+                totalRevenue += parseFloat(sale[12]);
+                const expirationDate = new Date(sale[6]);
+                const daysToExpire = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+                if (daysToExpire > 0 && daysToExpire <= 10) {
+                    expiringLicenses++;
+                    expiringSales.push(`${sale[0]} - Expira em: ${expirationDate.toLocaleDateString('pt-BR')}`);
+                }
+            });
+
+            document.getElementById('totalLicenses').innerText = totalLicenses;
+            document.getElementById('totalRevenue').innerText = totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('expiringLicenses').innerText = expiringLicenses;
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Receita Total'],
+                    datasets: [{
+                        label: 'Receita (R$)',
+                        data: [totalRevenue],
+                        backgroundColor: '#007bff',
+                        borderColor: '#0056b3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            window.expiringSales = expiringSales;
+        });
+
+        function showExpiring() {
+            alert('Licenças Próximas ao Vencimento (10 dias):\n\n' +
+                  (window.expiringSales.length > 0 ? window.expiringSales.join('\n') : 'Nenhuma licença expira nos próximos 10 dias.'));
+        }
+    </script>
+</body>
+</html>

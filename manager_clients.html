@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Clientes - Sistema de Gestão de Licenças</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gerenciar Clientes</h1>
+        <p class="text-center mb-4">Nota: Você pode cadastrar novos clientes diretamente ao adicionar uma venda.</p>
+        <h3 class="mt-4">Lista de Clientes</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="clientTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Observação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <button class="btn btn-secondary w-100 mt-3" onclick="window.location.href='dashboard.html'">Voltar</button>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        fetchClients().then(clients => {
+            const tbody = document.getElementById('clientTable').getElementsByTagName('tbody')[0];
+            clients.forEach((client, index) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = client[0];
+                row.insertCell(1).innerText = client[1];
+                const actionsCell = row.insertCell(2);
+                actionsCell.innerHTML = `
+                    <button class="btn btn-primary btn-sm" onclick="editClient(${index})">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteClient(${index})">Excluir</button>
+                `;
+            });
+        });
+
+        function editClient(index) {
+            const name = prompt('Novo nome do cliente:', document.getElementById('clientTable').rows[index + 1].cells[0].innerText);
+            if (name) {
+                const observation = prompt('Nova observação:', document.getElementById('clientTable').rows[index + 1].cells[1].innerText);
+                fetchClients().then(clients => {
+                    clients[index] = [name, observation];
+                    const url = new URL(API_URL);
+                    url.searchParams.append('method', 'editClient');
+                    url.searchParams.append('password', localStorage.getItem('password'));
+                    url.searchParams.append('row', index);
+                    url.searchParams.append('client', JSON.stringify([name, observation]));
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) window.location.reload();
+                            else alert('Erro ao editar cliente: ' + (data.error || 'Desconhecido'));
+                        });
+                });
+            }
+        }
+
+        function deleteClient(index) {
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                const url = new URL(API_URL);
+                url.searchParams.append('method', 'deleteClient');
+                url.searchParams.append('password', localStorage.getItem('password'));
+                url.searchParams.append('row', index);
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) window.location.reload();
+                        else alert('Erro ao excluir cliente: ' + (data.error || 'Desconhecido'));
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

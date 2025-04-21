@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Licenças</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Bem-vindo ao Sistema</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-success w-100" onclick="window.location.href='add_sale.html'">Adicionar Venda</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-primary w-100" onclick="window.location.href='dashboard_view.html'">Ver Dashboard</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-info w-100" onclick="window.location.href='manage_clients.html'">Gerenciar Clientes</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-warning w-100" onclick="window.location.href='sales_history.html'">Histórico de Vendas</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-secondary w-100" onclick="exportSales()">Exportar Vendas</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-info w-100" onclick="showHelp()">Ajuda</button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-danger w-100" onclick="logout()">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
