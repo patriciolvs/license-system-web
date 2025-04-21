@@ -1,26 +1,42 @@
 // Substitua pelo URL do seu Web App
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
-function sendBackup() {
-    const email = prompt('Digite o e-mail para enviar o backup:');
-    if (email) {
-        const url = new URL(API_URL);
-        url.searchParams.append('method', 'sendBackup');
-        url.searchParams.append('email', email);
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Backup enviado com sucesso para ' + email);
-                } else {
-                    alert('Erro ao enviar backup: ' + (data.error || 'Desconhecido'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao enviar backup:', error);
-                alert('Erro ao enviar backup: ' + error.message);
-            });
-    }
+function downloadBackup() {
+    // Baixar backup de vendas
+    const salesUrl = new URL(API_URL);
+    salesUrl.searchParams.append('method', 'downloadBackup');
+    salesUrl.searchParams.append('type', 'sales');
+    fetch(salesUrl)
+        .then(response => response.text())
+        .then(csv => {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'sales_backup_' + new Date().toISOString().replace(/[:.]/g, '-') + '.csv';
+            link.click();
+        })
+        .catch(error => {
+            console.error('Erro ao baixar backup de vendas:', error);
+            alert('Erro ao baixar backup de vendas: ' + error.message);
+        });
+
+    // Baixar backup de clientes
+    const clientsUrl = new URL(API_URL);
+    clientsUrl.searchParams.append('method', 'downloadBackup');
+    clientsUrl.searchParams.append('type', 'clients');
+    fetch(clientsUrl)
+        .then(response => response.text())
+        .then(csv => {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'clients_backup_' + new Date().toISOString().replace(/[:.]/g, '-') + '.csv';
+            link.click();
+        })
+        .catch(error => {
+            console.error('Erro ao baixar backup de clientes:', error);
+            alert('Erro ao baixar backup de clientes: ' + error.message);
+        });
 }
 
 function logout() {
@@ -100,7 +116,7 @@ function showHelp() {
           '4. Histórico de Vendas: Visualize, edite ou exclua vendas registradas.\n' +
           '5. Licenças a Vencer: Filtre e exporte licenças próximas ao vencimento.\n' +
           '6. Exportar Vendas: Exporte todas as vendas para um arquivo CSV.\n' +
-          '7. Configurações: Envie um backup por e-mail ou saia do sistema.\n\n' +
+          '7. Configurações: Baixe o backup ou saia do sistema.\n\n' +
           'Nota: Certifique-se de salvar os dados regularmente.');
 }
 
@@ -124,8 +140,7 @@ function updateCalculatedFields() {
     const dailyValue = (activationDate < expirationDate) ? (unitValueWithDiscount / Math.ceil((expirationDate - activationDate) / (1000 * 60 * 60 * 24))) : 0;
 
     document.getElementById('total_value').value = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('total_with_discount').value = totalWithDiscount.toLocaleString('pt-B
-R', { style: 'currency', currency: 'BRL' });
+    document.getElementById('total_with_discount').value = totalWithDiscount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('unit_value_with_discount').value = unitValueWithDiscount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('daily_value').value = dailyValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
