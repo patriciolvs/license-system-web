@@ -17,6 +17,10 @@ function login() {
             } else {
                 alert('Senha incorreta.');
             }
+        })
+        .catch(error => {
+            console.error('Erro ao fazer login:', error);
+            alert('Erro ao fazer login: ' + error.message);
         });
 }
 
@@ -36,6 +40,10 @@ function changePassword() {
                 } else {
                     alert('Erro ao alterar senha: ' + (data.error || 'Desconhecido'));
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao alterar senha:', error);
+                alert('Erro ao alterar senha: ' + error.message);
             });
     }
 }
@@ -53,6 +61,10 @@ function recoverPassword() {
                 } else {
                     alert('Erro ao enviar e-mail de recuperação: ' + (data.error || 'Desconhecido'));
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao recuperar senha:', error);
+                alert('Erro ao recuperar senha: ' + error.message);
             });
     }
 }
@@ -72,6 +84,10 @@ function sendBackup() {
                 } else {
                     alert('Erro ao enviar backup: ' + (data.error || 'Desconhecido'));
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar backup:', error);
+                alert('Erro ao enviar backup: ' + error.message);
             });
     }
 }
@@ -90,6 +106,10 @@ function fetchClients() {
         .then(data => {
             if (data.error) throw new Error(data.error);
             return data;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar clientes:', error);
+            throw error;
         });
 }
 
@@ -102,6 +122,10 @@ function fetchSales() {
         .then(data => {
             if (data.error) throw new Error(data.error);
             return data;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar vendas:', error);
+            throw error;
         });
 }
 
@@ -116,6 +140,10 @@ function saveSale(sale, row, callback) {
         .then(data => {
             if (data.success) callback();
             else alert('Erro ao salvar venda: ' + (data.error || 'Desconhecido'));
+        })
+        .catch(error => {
+            console.error('Erro ao salvar venda:', error);
+            alert('Erro ao salvar venda: ' + error.message);
         });
 }
 
@@ -131,6 +159,10 @@ function exportSales() {
             link.href = URL.createObjectURL(blob);
             link.download = 'Vendas_Exportadas_' + new Date().toISOString().replace(/[:.]/g, '-') + '.csv';
             link.click();
+        })
+        .catch(error => {
+            console.error('Erro ao exportar vendas:', error);
+            alert('Erro ao exportar vendas: ' + error.message);
         });
 }
 
