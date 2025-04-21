@@ -2,13 +2,10 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
 function login() {
-    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    localStorage.setItem('email', email);
     localStorage.setItem('password', password);
     const url = new URL(API_URL);
     url.searchParams.append('method', 'checkPassword');
-    url.searchParams.append('email', email);
     url.searchParams.append('password', password);
     fetch(url)
         .then(response => response.json())
@@ -18,66 +15,13 @@ function login() {
             } else if (data) {
                 window.location.href = 'dashboard.html';
             } else {
-                alert('E-mail ou senha incorretos.');
+                alert('Senha incorreta.');
             }
         })
         .catch(error => {
             console.error('Erro ao fazer login:', error);
             alert('Erro ao fazer login: ' + error.message);
         });
-}
-
-function changePassword() {
-    const email = localStorage.getItem('email');
-    const newPassword = prompt('Digite a nova senha:');
-    if (newPassword) {
-        const url = new URL(API_URL);
-        url.searchParams.append('method', 'changePassword');
-        url.searchParams.append('email', email);
-        url.searchParams.append('password', localStorage.getItem('password'));
-        url.searchParams.append('newPassword', newPassword);
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    localStorage.setItem('password', newPassword);
-                    alert('Senha alterada com sucesso!');
-                } else {
-                    alert('Erro ao alterar senha: ' + (data.error || 'Desconhecido'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao alterar senha:', error);
-                alert('Erro ao alterar senha: ' + error.message);
-            });
-    }
-}
-
-function recoverPassword() {
-    const email = document.getElementById('email').value;
-    if (!email) {
-        alert('Por favor, insira seu e-mail antes de recuperar a senha.');
-        return;
-    }
-    if (confirm('Uma nova senha será enviada para o e-mail registrado. Continuar?')) {
-        const url = new URL(API_URL);
-        url.searchParams.append('method', 'recoverPassword');
-        url.searchParams.append('email', email);
-        url.searchParams.append('password', localStorage.getItem('password') || '');
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Uma nova senha foi enviada para o e-mail registrado. Verifique sua caixa de entrada.');
-                } else {
-                    alert('Erro ao enviar e-mail de recuperação: ' + (data.error || 'Desconhecido'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao recuperar senha:', error);
-                alert('Erro ao recuperar senha: ' + error.message);
-            });
-    }
 }
 
 function sendBackup() {
@@ -104,7 +48,6 @@ function sendBackup() {
 }
 
 function logout() {
-    localStorage.removeItem('email');
     localStorage.removeItem('password');
     window.location.href = 'index.html';
 }
@@ -186,7 +129,7 @@ function showHelp() {
           '4. Histórico de Vendas: Visualize, edite ou exclua vendas registradas.\n' +
           '5. Licenças a Vencer: Filtre e exporte licenças próximas ao vencimento.\n' +
           '6. Exportar Vendas: Exporte todas as vendas para um arquivo CSV.\n' +
-          '7. Configurações: Altere ou recupere sua senha, ou envie um backup por e-mail.\n\n' +
+          '7. Configurações: Envie um backup por e-mail ou saia do sistema.\n\n' +
           'Nota: Certifique-se de salvar os dados regularmente.');
 }
 
