@@ -15,10 +15,10 @@
                     <div class="card-body text-center">
                         <img src="https://img.icons8.com/ios-filled/50/ffffff/lock.png" alt="Ícone de Login" class="mb-3">
                         <h1 class="card-title mb-4">Bem-vindo ao Sistema</h1>
-                        <p class="text-muted mb-4">Digite seu e-mail e senha para acessar o Sistema de Gestão de Licenças</p>
+                        <p class="text-muted mb-4">Digite seu usuário e senha para acessar o Sistema de Gestão de Licenças</p>
                         <div class="mb-3">
-                            <label for="email" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" required>
+                            <label for="username" class="form-label">Usuário</label>
+                            <input type="text" class="form-control" id="username" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Senha</label>
@@ -32,8 +32,8 @@
     </div>
     <script src="scripts.js"></script>
     <script>
-        // Verificar se o usuário já está cadastrado
-        checkUserStatus();
+        // Verificar se a segurança com senha está ativada
+        checkPasswordRequirement();
     </script>
 </body>
 </html>
