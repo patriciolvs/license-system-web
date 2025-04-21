@@ -3,12 +3,11 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3se
 
 // Lista predefinida de e-mails
 const emailList = [
-    "lopat@outlook.com",
     "lopat.nfe@gmail.com",
-    "lopat.nfe@outlook.com",
-    "lopat.jatai@gmail.com",
-    "lopat.tecnologia@outlook.com"
-    "elianesav@hotmail.com"
+    "patricio@example.com",
+    "teste@example.com",
+    "usuario1@gmail.com",
+    "usuario2@outlook.com"
 ];
 
 function populateEmailList() {
