@@ -2,10 +2,13 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
 function login() {
+    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    localStorage.setItem('email', email);
     localStorage.setItem('password', password);
     const url = new URL(API_URL);
     url.searchParams.append('method', 'checkPassword');
+    url.searchParams.append('email', email);
     url.searchParams.append('password', password);
     fetch(url)
         .then(response => response.json())
@@ -15,7 +18,7 @@ function login() {
             } else if (data) {
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Senha incorreta.');
+                alert('E-mail ou senha incorretos.');
             }
         })
         .catch(error => {
@@ -25,10 +28,12 @@ function login() {
 }
 
 function changePassword() {
+    const email = localStorage.getItem('email');
     const newPassword = prompt('Digite a nova senha:');
     if (newPassword) {
         const url = new URL(API_URL);
         url.searchParams.append('method', 'changePassword');
+        url.searchParams.append('email', email);
         url.searchParams.append('password', localStorage.getItem('password'));
         url.searchParams.append('newPassword', newPassword);
         fetch(url)
@@ -49,10 +54,16 @@ function changePassword() {
 }
 
 function recoverPassword() {
+    const email = localStorage.getItem('email') || document.getElementById('email').value;
+    if (!email) {
+        alert('Por favor, insira seu e-mail na tela de login antes de recuperar a senha.');
+        return;
+    }
     if (confirm('Uma nova senha será enviada para o e-mail registrado. Continuar?')) {
         const url = new URL(API_URL);
         url.searchParams.append('method', 'recoverPassword');
-        url.searchParams.append('password', localStorage.getItem('password'));
+        url.searchParams.append('email', email);
+        url.searchParams.append('password', localStorage.getItem('password') || '');
         fetch(url)
             .then(response => response.json())
             .then(data => {
@@ -70,7 +81,7 @@ function recoverPassword() {
 }
 
 function sendBackup() {
-    const email = prompt('Digite o e-mail para enviar o backup:');
+    const email = localStorage.getItem('email') || prompt('Digite o e-mail para enviar o backup:');
     if (email) {
         const url = new URL(API_URL);
         url.searchParams.append('method', 'sendBackup');
@@ -93,6 +104,7 @@ function sendBackup() {
 }
 
 function logout() {
+    localStorage.removeItem('email');
     localStorage.removeItem('password');
     window.location.href = 'index.html';
 }
