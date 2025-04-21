@@ -1,5 +1,5 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "INSIRA_O_URL_DO_SEU_WEB_APP_AQUI"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
+const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
 function login() {
     const password = document.getElementById('password').value;
