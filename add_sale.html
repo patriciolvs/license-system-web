@@ -30,7 +30,10 @@
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">E-mail Compra</label>
-            <input type="email" class="form-control" id="email" required>
+            <input type="email" class="form-control" id="email" list="emailList" required>
+            <datalist id="emailList">
+                <!-- E-mails serão preenchidos dinamicamente -->
+            </datalist>
         </div>
         <div class="mb-3">
             <label for="activation_code" class="form-label">Código Ativação</label>
@@ -147,6 +150,9 @@
                 window.location.href = 'dashboard.html';
             });
         }
+
+        // Preencher a lista de e-mails
+        populateEmailList();
     </script>
 </body>
 </html>
