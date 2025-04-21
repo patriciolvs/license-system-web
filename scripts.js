@@ -139,26 +139,58 @@ function showHelp() {
 }
 
 function updateCalculatedFields() {
-    const activationDate = new Date(document.getElementById('activation_date').value);
-    const expirationDate = new Date(document.getElementById('expiration_date').value);
+    const activationDate = document.getElementById('activation_date').value;
+    const expirationDate = document.getElementById('expiration_date').value;
     const licenseValue = parseFloat(document.getElementById('license_value').value) || 0;
     const quantity = parseInt(document.getElementById('quantity').value) || 0;
     const discount = parseFloat(document.getElementById('discount').value) || 0;
 
+    // Log para depuração
+    console.log('Valores de entrada:', {
+        activationDate,
+        expirationDate,
+        licenseValue,
+        quantity,
+        discount
+    });
+
     // Calcular dias para expirar
+    const activationDateObj = new Date(activationDate);
+    const expirationDateObj = new Date(expirationDate);
     const today = new Date();
-    const daysToExpire = Math.max(0, Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24)));
-    if (expirationDate < today) daysToExpire = 0;
+    let daysToExpire = 0;
+    if (!isNaN(activationDateObj) && !isNaN(expirationDateObj)) {
+        daysToExpire = Math.max(0, Math.ceil((expirationDateObj - today) / (1000 * 60 * 60 * 24)));
+        if (expirationDateObj < today) daysToExpire = 0;
+    }
     document.getElementById('days_to_expire').value = daysToExpire;
 
     // Calcular valores
     const totalValue = licenseValue * quantity;
     const totalWithDiscount = totalValue - discount;
-    const unitValueWithDiscount = totalWithDiscount / quantity;
-    const dailyValue = (activationDate < expirationDate) ? (unitValueWithDiscount / Math.ceil((expirationDate - activationDate) / (1000 * 60 * 60 * 24))) : 0;
+    const unitValueWithDiscount = quantity > 0 ? totalWithDiscount / quantity : 0;
+    const dailyValue = (!isNaN(activationDateObj) && !isNaN(expirationDateObj) && activationDateObj < expirationDateObj)
+        ? (unitValueWithDiscount / Math.ceil((expirationDateObj - activationDateObj) / (1000 * 60 * 60 * 24)))
+        : 0;
 
+    // Log para depuração
+    console.log('Valores calculados:', {
+        daysToExpire,
+        totalValue,
+        totalWithDiscount,
+        unitValueWithDiscount,
+        dailyValue
+    });
+
+    // Armazenar valores formatados para exibição
     document.getElementById('total_value').value = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('total_with_discount').value = totalWithDiscount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('unit_value_with_discount').value = unitValueWithDiscount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('daily_value').value = dailyValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // Armazenar valores brutos para uso posterior
+    document.getElementById('total_value_raw').value = totalValue;
+    document.getElementById('total_with_discount_raw').value = totalWithDiscount;
+    document.getElementById('unit_value_with_discount_raw').value = unitValueWithDiscount;
+    document.getElementById('daily_value_raw').value = dailyValue;
 }
