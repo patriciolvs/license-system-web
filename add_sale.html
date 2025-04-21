@@ -66,18 +66,22 @@
         <div class="mb-3">
             <label for="total_value" class="form-label">Valor Total (R$)</label>
             <input type="text" class="form-control" id="total_value" readonly>
+            <input type="hidden" id="total_value_raw">
         </div>
         <div class="mb-3">
             <label for="total_with_discount" class="form-label">Valor c/ Desconto (R$)</label>
             <input type="text" class="form-control" id="total_with_discount" readonly>
+            <input type="hidden" id="total_with_discount_raw">
         </div>
         <div class="mb-3">
             <label for="unit_value_with_discount" class="form-label">Valor Unitário c/ Desc (R$)</label>
             <input type="text" class="form-control" id="unit_value_with_discount" readonly>
+            <input type="hidden" id="unit_value_with_discount_raw">
         </div>
         <div class="mb-3">
             <label for="daily_value" class="form-label">Valor Diário (R$)</label>
             <input type="text" class="form-control" id="daily_value" readonly>
+            <input type="hidden" id="daily_value_raw">
         </div>
         <button class="btn btn-success w-100 mb-2" onclick="validateAndSave()">Salvar</button>
         <button class="btn btn-danger w-100" onclick="window.location.href='dashboard.html'">Cancelar</button>
@@ -102,10 +106,14 @@
                 document.getElementById('license_value').value = sale[8];
                 document.getElementById('quantity').value = sale[9];
                 document.getElementById('total_value').value = parseFloat(sale[10]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('total_value_raw').value = parseFloat(sale[10]);
                 document.getElementById('discount').value = sale[11];
                 document.getElementById('total_with_discount').value = parseFloat(sale[12]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('total_with_discount_raw').value = parseFloat(sale[12]);
                 document.getElementById('unit_value_with_discount').value = parseFloat(sale[13]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('unit_value_with_discount_raw').value = parseFloat(sale[13]);
                 document.getElementById('daily_value').value = parseFloat(sale[14]).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('daily_value_raw').value = parseFloat(sale[14]);
             }).catch(error => {
                 console.error('Erro ao carregar dados para edição:', error);
                 alert('Erro ao carregar dados para edição: ' + error.message);
@@ -139,23 +147,17 @@
             const expirationDateObj = new Date(expirationDate);
             if (expirationDateObj <= activationDateObj) return alert('A data de validade deve ser posterior à data de ativação.');
 
+            // Garantir que os cálculos sejam atualizados antes de salvar
+            updateCalculatedFields();
+
             // Adicionar validação para os campos calculados
             const daysToExpire = parseInt(document.getElementById('days_to_expire').value);
-            const totalValueStr = document.getElementById('total_value').value;
-            const totalWithDiscountStr = document.getElementById('total_with_discount').value;
-            const unitValueWithDiscountStr = document.getElementById('unit_value_with_discount').value;
-            const dailyValueStr = document.getElementById('daily_value').value;
+            const totalValue = parseFloat(document.getElementById('total_value_raw').value);
+            const totalWithDiscount = parseFloat(document.getElementById('total_with_discount_raw').value);
+            const unitValueWithDiscount = parseFloat(document.getElementById('unit_value_with_discount_raw').value);
+            const dailyValue = parseFloat(document.getElementById('daily_value_raw').value);
 
             if (isNaN(daysToExpire)) return alert('Erro: "Dias para Expirar" não é um número válido.');
-            if (!totalValueStr || !totalWithDiscountStr || !unitValueWithDiscountStr || !dailyValueStr) {
-                return alert('Erro: Um ou mais campos calculados não foram preenchidos corretamente. Tente ajustar os valores e recalcular.');
-            }
-
-            const totalValue = parseFloat(totalValueStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
-            const totalWithDiscount = parseFloat(totalWithDiscountStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
-            const unitValueWithDiscount = parseFloat(unitValueWithDiscountStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
-            const dailyValue = parseFloat(dailyValueStr.replace('R$ ', '').replace('.', '').replace(',', '.'));
-
             if (isNaN(totalValue) || isNaN(totalWithDiscount) || isNaN(unitValueWithDiscount) || isNaN(dailyValue)) {
                 return alert('Erro: Um ou mais campos calculados contém valores inválidos. Tente ajustar os valores e recalcular.');
             }
