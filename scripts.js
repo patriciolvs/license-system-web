@@ -54,9 +54,9 @@ function changePassword() {
 }
 
 function recoverPassword() {
-    const email = localStorage.getItem('email') || document.getElementById('email').value;
+    const email = document.getElementById('email').value;
     if (!email) {
-        alert('Por favor, insira seu e-mail na tela de login antes de recuperar a senha.');
+        alert('Por favor, insira seu e-mail antes de recuperar a senha.');
         return;
     }
     if (confirm('Uma nova senha será enviada para o e-mail registrado. Continuar?')) {
@@ -81,7 +81,7 @@ function recoverPassword() {
 }
 
 function sendBackup() {
-    const email = localStorage.getItem('email') || prompt('Digite o e-mail para enviar o backup:');
+    const email = prompt('Digite o e-mail para enviar o backup:');
     if (email) {
         const url = new URL(API_URL);
         url.searchParams.append('method', 'sendBackup');
