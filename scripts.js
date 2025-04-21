@@ -1,32 +1,32 @@
 // Substitua pelo URL do seu Web App
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
-function checkUserStatus() {
+function checkPasswordRequirement() {
     const url = new URL(API_URL);
-    url.searchParams.append('method', 'checkUserStatus');
+    url.searchParams.append('method', 'checkPasswordRequirement');
     fetch(url)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 alert(data.error);
-            } else if (!data.hasUser) {
-                window.location.href = 'register.html';
+            } else if (!data.requiresPassword) {
+                window.location.href = 'dashboard.html';
             }
         })
         .catch(error => {
-            console.error('Erro ao verificar status do usuário:', error);
-            alert('Erro ao verificar status do usuário: ' + error.message);
+            console.error('Erro ao verificar necessidade de senha:', error);
+            alert('Erro ao verificar necessidade de senha: ' + error.message);
         });
 }
 
 function login() {
-    const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    localStorage.setItem('email', email);
+    localStorage.setItem('username', username);
     localStorage.setItem('password', password);
     const url = new URL(API_URL);
     url.searchParams.append('method', 'checkPassword');
-    url.searchParams.append('email', email);
+    url.searchParams.append('username', username);
     url.searchParams.append('password', password);
     fetch(url)
         .then(response => response.json())
@@ -37,7 +37,7 @@ function login() {
             } else if (data) {
                 window.location.href = 'dashboard.html';
             } else {
-                alert('E-mail ou senha incorretos.');
+                alert('Usuário ou senha incorretos.');
             }
         })
         .catch(error => {
@@ -46,28 +46,28 @@ function login() {
         });
 }
 
-function register() {
-    const email = document.getElementById('email').value;
+function activatePassword() {
+    const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    localStorage.setItem('email', email);
+    localStorage.setItem('username', username);
     localStorage.setItem('password', password);
     const url = new URL(API_URL);
-    url.searchParams.append('method', 'registerUser');
-    url.searchParams.append('email', email);
+    url.searchParams.append('method', 'activatePassword');
+    url.searchParams.append('username', username);
     url.searchParams.append('password', password);
     fetch(url)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Usuário cadastrado com sucesso! Faça login para continuar.');
+                alert('Senha ativada com sucesso! Você será redirecionado para a tela de login.');
                 window.location.href = 'index.html';
             } else {
-                alert('Erro ao cadastrar usuário: ' + (data.error || 'Desconhecido'));
+                alert('Erro ao ativar senha: ' + (data.error || 'Desconhecido'));
             }
         })
         .catch(error => {
-            console.error('Erro ao cadastrar usuário:', error);
-            alert('Erro ao cadastrar usuário: ' + error.message);
+            console.error('Erro ao ativar senha:', error);
+            alert('Erro ao ativar senha: ' + error.message);
         });
 }
 
@@ -76,7 +76,7 @@ function sendBackup() {
     if (email) {
         const url = new URL(API_URL);
         url.searchParams.append('method', 'sendBackup');
-        url.searchParams.append('password', localStorage.getItem('password'));
+        url.searchParams.append('password', localStorage.getItem('password') || '');
         url.searchParams.append('email', email);
         fetch(url)
             .then(response => response.json())
@@ -95,7 +95,7 @@ function sendBackup() {
 }
 
 function logout() {
-    localStorage.removeItem('email');
+    localStorage.removeItem('username');
     localStorage.removeItem('password');
     window.location.href = 'index.html';
 }
@@ -103,7 +103,7 @@ function logout() {
 function fetchClients() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getClients');
-    url.searchParams.append('password', localStorage.getItem('password'));
+    url.searchParams.append('password', localStorage.getItem('password') || '');
     return fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -119,7 +119,7 @@ function fetchClients() {
 function fetchSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getSales');
-    url.searchParams.append('password', localStorage.getItem('password'));
+    url.searchParams.append('password', localStorage.getItem('password') || '');
     return fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -135,7 +135,7 @@ function fetchSales() {
 function saveSale(sale, row, callback) {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'saveSale');
-    url.searchParams.append('password', localStorage.getItem('password'));
+    url.searchParams.append('password', localStorage.getItem('password') || '');
     url.searchParams.append('sale', JSON.stringify(sale));
     if (row !== null) url.searchParams.append('row', row);
     fetch(url)
@@ -153,7 +153,7 @@ function saveSale(sale, row, callback) {
 function exportSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'exportSales');
-    url.searchParams.append('password', localStorage.getItem('password'));
+    url.searchParams.append('password', localStorage.getItem('password') || '');
     fetch(url)
         .then(response => response.text())
         .then(csv => {
@@ -177,7 +177,7 @@ function showHelp() {
           '4. Histórico de Vendas: Visualize, edite ou exclua vendas registradas.\n' +
           '5. Licenças a Vencer: Filtre e exporte licenças próximas ao vencimento.\n' +
           '6. Exportar Vendas: Exporte todas as vendas para um arquivo CSV.\n' +
-          '7. Configurações: Envie um backup por e-mail ou saia do sistema.\n\n' +
+          '7. Configurações: Ative a senha, envie um backup por e-mail ou saia do sistema.\n\n' +
           'Nota: Certifique-se de salvar os dados regularmente.');
 }
 
