@@ -35,6 +35,7 @@
         <button class="btn btn-primary w-100 mb-3" onclick="showExpiring()">Verificar Expirações</button>
         <button class="btn btn-secondary w-100" onclick="window.location.href='dashboard.html'">Voltar</button>
     </div>
+    <script src="config.js"></script>
     <script src="scripts.js"></script>
     <script>
         fetchSales().then(sales => {
@@ -79,6 +80,9 @@
             });
 
             window.expiringSales = expiringSales;
+        }).catch(error => {
+            console.error('Erro ao carregar dados do dashboard:', error);
+            alert('Erro ao carregar dados do dashboard: ' + error.message);
         });
 
         function showExpiring() {
