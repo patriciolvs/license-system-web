@@ -1,8 +1,5 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "https://script.google.com/macros/s/AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw/exec";
-
-// Token de API (definido no config.js ou diretamente aqui)
-const API_TOKEN = config.apiToken || "AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw"; // Use config.apiToken se estiver usando config.js
+const API_URL = "https://script.google.com/macros/s/AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
 // Lista predefinida de e-mails
 const emailList = [
@@ -27,7 +24,6 @@ function downloadBackup() {
     const salesUrl = new URL(API_URL);
     salesUrl.searchParams.append('method', 'downloadBackup');
     salesUrl.searchParams.append('type', 'sales');
-    salesUrl.searchParams.append('token', API_TOKEN); // Adiciona o token
     fetch(salesUrl)
         .then(response => response.text())
         .then(csv => {
@@ -46,7 +42,6 @@ function downloadBackup() {
     const clientsUrl = new URL(API_URL);
     clientsUrl.searchParams.append('method', 'downloadBackup');
     clientsUrl.searchParams.append('type', 'clients');
-    clientsUrl.searchParams.append('token', API_TOKEN); // Adiciona o token
     fetch(clientsUrl)
         .then(response => response.text())
         .then(csv => {
@@ -69,7 +64,6 @@ function logout() {
 function fetchClients() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getClients');
-    url.searchParams.append('token', API_TOKEN); // Adiciona o token
     return fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -85,7 +79,6 @@ function fetchClients() {
 function fetchSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getSales');
-    url.searchParams.append('token', API_TOKEN); // Adiciona o token
     return fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -102,7 +95,6 @@ function saveSale(sale, row, callback) {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'saveSale');
     url.searchParams.append('sale', JSON.stringify(sale));
-    url.searchParams.append('token', API_TOKEN); // Adiciona o token
     if (row !== null) url.searchParams.append('row', row);
     fetch(url)
         .then(response => response.json())
@@ -119,7 +111,6 @@ function saveSale(sale, row, callback) {
 function exportSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'exportSales');
-    url.searchParams.append('token', API_TOKEN); // Adiciona o token
     fetch(url)
         .then(response => response.text())
         .then(csv => {
