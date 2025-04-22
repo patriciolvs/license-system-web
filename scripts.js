@@ -1,5 +1,5 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzMf2RdzZWnXtdhzb3y__0uQ4tOXHdBTnj3QF3erPjU62agp92aJHgu-UjA3CrkbKD5cQ/exec";
 
 // Token de API (definido no config.js ou diretamente aqui)
 const API_TOKEN = config.apiToken || "AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA"; // Use config.apiToken se estiver usando config.js
