@@ -1,9 +1,8 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "https://script.google.com/macros/s/AKfycbzMf2RdzZWnXtdhzb3y__0uQ4tOXHdBTnj3QF3erPjU62agp92aJHgu-UjA3CrkbKD5cQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw/exec";
 
 // Token de API (definido no config.js ou diretamente aqui)
-const API_TOKEN = config.apiToken || "AKfycbzMf2RdzZWnXtdhzb3y__0uQ4tOXHdBTnj3QF3erPjU62agp92aJHgu-UjA3CrkbKD5cQ
-"; // Use config.apiToken se estiver usando config.js
+const API_TOKEN = config.apiToken || "AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw"; // Use config.apiToken se estiver usando config.js
 
 // Lista predefinida de e-mails
 const emailList = [
