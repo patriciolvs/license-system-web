@@ -95,6 +95,7 @@ function saveSale(sale, row, callback) {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'saveSale');
     url.searchParams.append('sale', JSON.stringify(sale));
+    url.searchParams.append('token', API_TOKEN);
     if (row !== null) url.searchParams.append('row', row);
     fetch(url)
         .then(response => response.json())
