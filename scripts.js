@@ -1,5 +1,5 @@
 // Substitua pelo URL do seu Web App
-const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
+const API_URL = "https://script.google.com/macros/s/AKfycby9wmolJyXwnQNJqLMZPnAgAbMnk3Og2XEAjin3yRhLN1GDtrvmLV3ahm5mWCSf66dcPw/exec"; // Ex.: "https://script.google.com/macros/s/[SEU_ID]/exec"
 
 // Lista predefinida de e-mails
 const emailList = [
