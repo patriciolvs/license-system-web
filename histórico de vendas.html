@@ -37,6 +37,7 @@
         </div>
         <button class="btn btn-secondary w-100 mt-3" onclick="window.location.href='dashboard.html'">Voltar</button>
     </div>
+    <script src="config.js"></script>
     <script src="scripts.js"></script>
     <script>
         fetchSales().then(sales => {
@@ -70,13 +71,21 @@
             if (confirm('Tem certeza que deseja excluir esta venda?')) {
                 const url = new URL(API_URL);
                 url.searchParams.append('method', 'deleteSale');
-                url.searchParams.append('password', localStorage.getItem('password'));
+                url.searchParams.append('token', API_TOKEN);
                 url.searchParams.append('row', index);
+                console.log('Excluindo venda:', url.toString());
                 fetch(url)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) window.location.reload();
                         else alert('Erro ao excluir venda: ' + (data.error || 'Desconhecido'));
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir venda:', error);
+                        alert('Erro ao excluir venda: ' + error.message);
                     });
             }
         }
