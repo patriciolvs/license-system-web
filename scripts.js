@@ -1,7 +1,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwkYgxjEnwpUVE4LlKg-3seiwfPxNJ10w6_B7d3GeA4u8evI_9SbJCno5DrsnZsX78bgA/exec";
 
-// Token de API (deve ser definido em config.js ou diretamente aqui)
-const API_TOKEN = config.apiToken || "seu_token_unico_aqui_123456"; // Substitua pelo token correto
+// Token de API (deve ser definido em config.js)
+const API_TOKEN = config.apiToken; // Não inclua um valor padrão aqui para forçar o uso de config.js
 
 // Lista predefinida de e-mails
 const emailList = [
@@ -14,6 +14,10 @@ const emailList = [
 
 function populateEmailList() {
     const datalist = document.getElementById('emailList');
+    if (!datalist) {
+        console.error("Elemento 'emailList' não encontrado no DOM");
+        return;
+    }
     emailList.forEach(email => {
         const option = document.createElement('option');
         option.value = email;
@@ -27,9 +31,10 @@ function downloadBackup() {
     salesUrl.searchParams.append('method', 'downloadBackup');
     salesUrl.searchParams.append('type', 'sales');
     salesUrl.searchParams.append('token', API_TOKEN);
+    console.log('Baixando backup de vendas:', salesUrl.toString());
     fetch(salesUrl)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.text();
         })
         .then(csv => {
@@ -49,9 +54,10 @@ function downloadBackup() {
     clientsUrl.searchParams.append('method', 'downloadBackup');
     clientsUrl.searchParams.append('type', 'clients');
     clientsUrl.searchParams.append('token', API_TOKEN);
+    console.log('Baixando backup de clientes:', clientsUrl.toString());
     fetch(clientsUrl)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.text();
         })
         .then(csv => {
@@ -75,9 +81,10 @@ function fetchClients() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getClients');
     url.searchParams.append('token', API_TOKEN);
+    console.log('Buscando clientes:', url.toString());
     return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.json();
         })
         .then(data => {
@@ -94,9 +101,10 @@ function fetchSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'getSales');
     url.searchParams.append('token', API_TOKEN);
+    console.log('Buscando vendas:', url.toString());
     return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.json();
         })
         .then(data => {
@@ -115,10 +123,10 @@ function saveSale(sale, row, callback) {
     url.searchParams.append('sale', JSON.stringify(sale));
     url.searchParams.append('token', API_TOKEN);
     if (row !== null) url.searchParams.append('row', row);
-    console.log('URL da requisição:', url.toString()); // Log para depuração
+    console.log('Salvando venda:', url.toString());
     fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.json();
         })
         .then(data => {
@@ -139,9 +147,10 @@ function exportSales() {
     const url = new URL(API_URL);
     url.searchParams.append('method', 'exportSales');
     url.searchParams.append('token', API_TOKEN);
+    console.log('Exportando vendas:', url.toString());
     fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
             return response.text();
         })
         .then(csv => {
@@ -170,11 +179,16 @@ function showHelp() {
 }
 
 function updateCalculatedFields() {
-    const activationDate = document.getElementById('activation_date').value;
-    const expirationDate = document.getElementById('expiration_date').value;
-    const licenseValue = parseFloat(document.getElementById('license_value').value) || 0;
-    const quantity = parseInt(document.getElementById('quantity').value) || 0;
-    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const activationDate = document.getElementById('activation_date')?.value;
+    const expirationDate = document.getElementById('expiration_date')?.value;
+    const licenseValue = parseFloat(document.getElementById('license_value')?.value) || 0;
+    const quantity = parseInt(document.getElementById('quantity')?.value) || 0;
+    const discount = parseFloat(document.getElementById('discount')?.value) || 0;
+
+    if (!activationDate || !expirationDate) {
+        console.warn('Datas de ativação ou validade não fornecidas');
+        return;
+    }
 
     console.log('Valores de entrada:', {
         activationDate,
