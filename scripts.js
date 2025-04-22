@@ -97,9 +97,14 @@ function saveSale(sale, row, callback) {
     url.searchParams.append('sale', JSON.stringify(sale));
     url.searchParams.append('token', API_TOKEN);
     if (row !== null) url.searchParams.append('row', row);
+    console.log('URL da requisição:', url.toString()); // Log para depuração
     fetch(url)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Resposta recebida:', response); // Log para depuração
+            return response.json();
+        })
         .then(data => {
+            console.log('Dados recebidos:', data); // Log para depuração
             if (data.success) callback();
             else alert('Erro ao salvar venda: ' + (data.error || 'Desconhecido'));
         })
