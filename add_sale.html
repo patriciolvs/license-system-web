@@ -86,6 +86,7 @@
         <button class="btn btn-success w-100 mb-2" onclick="validateAndSave()">Salvar</button>
         <button class="btn btn-danger w-100" onclick="window.location.href='dashboard.html'">Cancelar</button>
     </div>
+    <script src="config.js"></script>
     <script src="scripts.js"></script>
     <script>
         // Carregar dados se for edição
@@ -121,17 +122,18 @@
         }
 
         function validateAndSave() {
-            const clientName = document.getElementById('client_name').value;
-            const device = document.getElementById('device').value;
+            const clientName = document.getElementById('client_name').value.trim();
+            const device = document.getElementById('device').value.trim();
             const product = document.getElementById('product').value;
-            const email = document.getElementById('email').value;
-            const activationCode = document.getElementById('activation_code').value;
+            const email = document.getElementById('email').value.trim();
+            const activationCode = document.getElementById('activation_code').value.trim();
             const activationDate = document.getElementById('activation_date').value;
             const expirationDate = document.getElementById('expiration_date').value;
-            const licenseValue = document.getElementById('license_value').value;
-            const quantity = document.getElementById('quantity').value;
-            const discount = document.getElementById('discount').value;
+            const licenseValue = parseFloat(document.getElementById('license_value').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
 
+            // Validações
             if (!clientName) return alert('Por favor, insira o nome do cliente.');
             if (!device) return alert('Por favor, informe o dispositivo.');
             if (!product) return alert('Por favor, selecione um produto.');
@@ -139,13 +141,18 @@
             if (!activationCode) return alert('Por favor, insira o código de ativação.');
             if (!activationDate) return alert('Por favor, insira a data de ativação.');
             if (!expirationDate) return alert('Por favor, insira a data de validade.');
-            if (!licenseValue || parseFloat(licenseValue) <= 0) return alert('Por favor, insira um valor de licença válido (maior que 0).');
-            if (!quantity || parseInt(quantity) <= 0) return alert('Por favor, insira uma quantidade válida (maior que 0).');
-            if (!discount || parseFloat(discount) < 0) return alert('Por favor, insira um desconto válido (não negativo).');
+            if (licenseValue <= 0 || isNaN(licenseValue)) return alert('Por favor, insira um valor de licença válido (maior que 0).');
+            if (quantity <= 0 || isNaN(quantity)) return alert('Por favor, insira uma quantidade válida (maior que 0).');
+            if (discount < 0 || isNaN(discount)) return alert('Por favor, insira um desconto válido (não negativo).');
 
             const activationDateObj = new Date(activationDate);
             const expirationDateObj = new Date(expirationDate);
-            if (expirationDateObj <= activationDateObj) return alert('A data de validade deve ser posterior à data de ativação.');
+            if (isNaN(activationDateObj) || isNaN(expirationDateObj)) {
+                return alert('Por favor, insira datas válidas.');
+            }
+            if (expirationDateObj <= activationDateObj) {
+                return alert('A data de validade deve ser posterior à data de ativação.');
+            }
 
             // Garantir que os cálculos sejam atualizados antes de salvar
             updateCalculatedFields();
@@ -157,17 +164,26 @@
             const unitValueWithDiscount = parseFloat(document.getElementById('unit_value_with_discount_raw').value);
             const dailyValue = parseFloat(document.getElementById('daily_value_raw').value);
 
-            if (isNaN(daysToExpire)) return alert('Erro: "Dias para Expirar" não é um número válido.');
+            if (isNaN(daysToExpire) || daysToExpire < 0) {
+                return alert('Erro: "Dias para Expirar" não é um número válido.');
+            }
             if (isNaN(totalValue) || isNaN(totalWithDiscount) || isNaN(unitValueWithDiscount) || isNaN(dailyValue)) {
                 return alert('Erro: Um ou mais campos calculados contém valores inválidos. Tente ajustar os valores e recalcular.');
             }
 
             const sale = [
-                clientName, device, product, email, activationCode, activationDate, expirationDate,
+                clientName,
+                device,
+                product,
+                email,
+                activationCode,
+                activationDate,
+                expirationDate,
                 daysToExpire,
-                parseFloat(licenseValue), parseInt(quantity),
+                licenseValue,
+                quantity,
                 totalValue,
-                parseFloat(discount),
+                discount,
                 totalWithDiscount,
                 unitValueWithDiscount,
                 dailyValue
@@ -175,6 +191,11 @@
 
             // Log para depuração
             console.log("Array 'sale' antes de enviar:", sale);
+
+            // Verificar se há valores inválidos
+            if (sale.some(value => value === null || value === undefined || (typeof value === 'number' && isNaN(value)))) {
+                return alert('Erro: Um ou mais campos contém valores inválidos. Verifique os dados e tente novamente.');
+            }
 
             saveSale(sale, row ? parseInt(row) : null, () => {
                 window.location.href = 'dashboard.html';
